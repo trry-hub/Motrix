@@ -353,6 +353,11 @@
         let payload = null
         if (type === ADD_TASK_TYPE.URI) {
           payload = buildUriPayload(form)
+          console.log('payload: ', payload)
+          payload.uris = payload.uris.map(uri => {
+            const [url, name] = uri.split('\t')
+            return url + '$name:' + encodeURIComponent(name)
+          })
           this.$store.dispatch('task/addUri', payload).catch(err => {
             this.$msg.error(err.message)
           })

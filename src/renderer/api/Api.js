@@ -178,6 +178,12 @@ export default class Api {
       if (outs && outs[index]) {
         engineOptions.out = outs[index]
       }
+      // eslint-disable-next-line no-tabs
+      const [url, name] = uri.split('$name:')
+      engineOptions.out = decodeURIComponent(name)
+      uri = url || uri
+      console.log('engineOptions: ', engineOptions.out)
+
       const args = compactUndefined([[uri], engineOptions])
       return ['aria2.addUri', ...args]
     })

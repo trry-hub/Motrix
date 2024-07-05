@@ -75,6 +75,7 @@
   display: flex;
   height: 100%;
   flex-flow: column;
+  background-color: #414141;
 }
 .logo-mini {
   margin-top: 40px;
