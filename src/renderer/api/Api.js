@@ -12,6 +12,26 @@ import {
 } from '@shared/utils'
 import { ENGINE_RPC_HOST } from '@shared/constants'
 
+function sanitizeFileName (fileName) {
+  // 替换非法字符为下划线
+  // eslint-disable-next-line no-useless-escape
+  const illegalRe = /[\/\?<>\\:\*\|":]/g
+  let sanitizedFileName = fileName.replace(illegalRe, '_')
+
+  // 替换连续空格为单个下划线
+  const spacesRe = /\s+/g
+  sanitizedFileName = sanitizedFileName.replace(spacesRe, '_')
+
+  // 限制文件名长度，保留文件扩展名
+  const maxLength = 255
+  if (sanitizedFileName.length > maxLength) {
+    const extension = sanitizedFileName.slice(sanitizedFileName.lastIndexOf('.'))
+    sanitizedFileName = sanitizedFileName.slice(0, maxLength - extension.length) + extension
+  }
+
+  return sanitizedFileName
+}
+
 export default class Api {
   constructor (options = {}) {
     this.options = options
@@ -178,15 +198,14 @@ export default class Api {
       if (outs && outs[index]) {
         engineOptions.out = outs[index]
       }
-      // eslint-disable-next-line no-tabs
       const [url, name] = uri.split('$name:')
-      engineOptions.out = decodeURIComponent(name)
+      engineOptions.out = sanitizeFileName(decodeURIComponent(name))
       uri = url || uri
-      console.log('engineOptions: ', engineOptions.out)
 
       const args = compactUndefined([[uri], engineOptions])
       return ['aria2.addUri', ...args]
     })
+    console.log('tasks: ', tasks)
     return this.client.multicall(tasks)
   }
 
